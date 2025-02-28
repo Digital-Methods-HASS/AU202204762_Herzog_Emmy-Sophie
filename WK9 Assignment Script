@@ -1,0 +1,141 @@
+# Setting up the Environment 
+dir.create("data")
+dir.create("figures")
+dir.create("outputs")
+
+# Downloading SAFI clean CSV file - the data is stored in the data folder 
+download.file(
+  "https://raw.githubusercontent.com/datacarpentry/r-socialsci/main/episodes/data/SAFI_clean.csv",
+  "data/SAFI_clean.csv", mode = "wb"
+)
+
+# Installing "tidyverse" 
+install.packages("tidyverse")
+library(tidyverse)
+
+# Officially set up the environment 
+
+# Task 1 - Use R to figure out how many elements in the vector below are greater than 2
+rooms <- c(1,5,2, 3, 1, NA, 3, 1, 3, 2, NA, 1, 8, 3, 1, 4, NA, 1, 3, 1, 2, 1, 7, 1, NA, 4, 3 ,1 ,7 ,2 ,1 ,NA ,1, 1, 3)
+
+#T1 - Inspecting vector
+class(rooms)
+
+#T1 - It is numeric, though there is NA present 
+# T1 - Inspecting missing data 
+rooms <- c(1,5,2, 3, 1, NA, 3, 1, 3, 2, NA, 1, 8, 3, 1, 4, NA, 1, 3, 1, 2, 1, 7, 1, NA, 4, 3 ,1 ,7 ,2 ,1 ,NA ,1, 1, 3)
+class(rooms)
+mean(rooms)
+max(rooms)
+
+# T1 - Eliminating missing data using a function to skip NAs 
+na.omit(rooms)
+rooms[complete.cases(rooms)]
+
+# T1 - finding all elements that are greater than 2
+rooms >2
+
+# T1 - Eliminating missing data using function not successful - new method: optional argument, flag 
+rooms <- c(1,5,2, 3, 1, NA, 3, 1, 3, 2, NA, 1, 8, 3, 1, 4, NA, 1, 3, 1, 2, 1, 7, 1, NA, 4, 3 ,1 ,7 ,2 ,1 ,NA ,1, 1, 3)
+mean(rooms, na.rm = TRUE)
+max(rooms, na.rm = T)
+
+# T1 - Subsetting is needed 
+!is.na(rooms)
+rooms[!is.na(rooms)]
+rooms_nas_eliminated <- rooms[!is.na(rooms)]
+mean(rooms_nas_eliminated)
+
+# T1 - New Try: finding all elements that are greater than 2
+rooms_nas_eliminated >2
+
+# Task 2 - Which function tells you the type of data the `rooms` vector above contains? 
+class(rooms_nas_eliminated)
+
+# Task 3 - What is the result of running the median() function on the above `rooms` vector? 
+median(rooms_nas_eliminated)
+
+# Task 4 - Starting with data 
+read_csv("data/SAFI_clean.csv", na = c("NULL", "N/A", "NA"))
+interviews <- read_csv("data/SAFI_clean.csv", na = c("NULL", "N/A", "NA")) 
+interviews
+
+#Task 5 - Monarch Challenge
+read_csv("data/Danish_Monarchy_WK7.csv", na = c("NULL", "N/A", "NA"))
+
+# CSV file is not clean - the column names in the CSV file will be changed 
+# putting the new improved file into the system 
+read_csv("data/Improved_Danish_Monarch_WK7.csv", na = c("NULL", "N/A", "NA"))
+
+# Dealing with missing data - Try 1 
+
+# Selecting the two main columns - failed  
+select(Regerings_start, Regerings_slut)
+select(.data = Regerings_start, Regerings_slut)
+?select
+select(.data = Regerings_start)
+
+summarise("data/Improved_Danish_Monarch_WK7.csv")
+
+# Found the error, forgot to assign the csv data and add the (na= c("NULL", "N/A", "NA"))
+monarchs <- read_csv("data/Improved_Danish_Monarch_WK7.csv", na = c("NULL", "N/A", "NA"))
+
+# selecting the columns 
+select(monarchs, c(7, 8))
+
+# Dealing with missing data - Try 2 
+monarchs[["Regerings_start"]]
+monarchs[["Regerings_slut"]]
+
+# Dealing with missing data - Try3 
+drop_na(Regerings_start)
+drop_na(monarchs)
+
+# Dealing with missing data - Try4 - using function to skip NAs = result in error 
+na.omit(monarchs)
+monarchs[["Regerings_start"]]
+monarchs[["Regerings_slut"]]
+
+# Dealing with missing data - Try5 - using optional argument = result in error 
+mean(monarchs, na.rm = TRUE)
+
+# Dealing with missing data - Try 6 - using function to skip NAs = result in error 
+na.omit(monarchs)
+monarchs[complete.cases(monarchs)]
+
+# Dealing with data - Try 7 - subsetting 
+select(monarchs, c(7,8))
+monarchs_no_no_nas <- monarchs[c(7, 8)]
+!is.na(monarchs_no_no_nas)
+monarchs[!is.na(monarchs_no_no_nas)]
+monarchs_no_no_nas[!is.na(monarchs_no_no_nas)]
+
+# Finding the mean - This feels wrong though
+monarchs_nas_eliminated<-monarchs_no_no_nas[!is.na(monarchs_no_no_nas)]
+mean(monarchs_nas_eliminated)
+
+# Finding the median 
+median(monarchs_nas_eliminated)
+
+# Second try at solution 
+# assigning the columns to the regerings start and slut 
+select(monarchs, c(7, 8))
+regerings_start_no_nas<-monarchs[c(7)]
+regerings_slut_no_nas <- monarchs[c(8)]
+
+# Checking 
+!is.na(regerings_start_no_nas)
+!is.na(regerings_slut_no_nas)
+
+# Subsetting the missing data in Solution 2 
+
+regerings_slut_no_nas[!is.na(regerings_slut_no_nas)]
+regerings_start_no_nas[!is.na(regerings_start_no_nas)]
+
+regerings_start_nas_eliminated <- regerings_start_no_nas[!is.na(regerings_start_no_nas)]
+regerings_slut_nas_eliminated <- regerings_slut_no_nas[!is.na(regerings_slut_no_nas)]
+
+# Calculating the mean() of regerings_start and regerings_slut 
+mean(regerings_slut_nas_eliminated-regerings_start_nas_eliminated)
+
+# Did not work - First solution is correct 
